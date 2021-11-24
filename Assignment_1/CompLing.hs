@@ -99,24 +99,29 @@ finalPairs (x:xs) = getFinalPairOfLst x ++ finalPairs xs
 
 -- 4 ##########################################################################
 
--- PRE ATT DET SKA VARA ETT PAR KANSKE ÄNDÅ BLIR ERROR DÅ TYPEN BEHÖVER EXAKT 2 ST
+{-
+-}
 isPair :: (String, String) -> (String, String) -> Bool
 isPair (a,b) (x,y) = if (a == x || a == y) && (b == x || b == y)
   then True
   else False
 
+{-
+-}
 removePairFromPairs :: (String, String) -> Pairs -> Pairs
 removePairFromPairs (str1, str2) pairs =
   [x | x <- pairs, not (isPair (str1, str2) x)]
 
+{-
+-}
 pairsCountAUX :: (String, String) -> Pairs -> Int
 pairsCountAUX (_,_) [] = 0
 pairsCountAUX (str1, str2) (x:xs)
-  | isPair (str1, str2) x = 1 + pairsCountAUX (str1, str2) xs  -- om det är samma park
+  | isPair (str1, str2) x = 1 + pairsCountAUX (str1, str2) xs  -- om det är samma par
   | otherwise = 0 + pairsCountAUX (str1, str2) xs
 
--- {-
--- -}
+{-
+-}
 pairsCount :: Pairs -> PairsTally
 pairsCount [] = []
 pairsCount [x] = [((x), 1)]
@@ -125,10 +130,34 @@ pairsCount (x:xs) = [(x, pairsCountAUX x (x:xs) )] ++ pairsCount (removePairFrom
 
 
 -- 5 ##########################################################################
+
+-- BEÖVER VI CORNER CASES FÖR ALLA FUNKTIONER ELLER KAN VI FÖRKLARA PRECONDITIONS?
+
+wordInTally :: (String, String) -> String -> Bool
+wordInTally (str1, str2) word =
+  if word == str1 || word == str2
+    then True
+    else False
+
+getNeighbour :: (String, String) -> String -> String
+getNeighbour (str1, str2) word =
+  if word == str1
+    then str2
+    else str1
+
+
+neighbourAUX :: ((String, String), Int) -> String -> WordTally
+neighbourAUX ((str1, str2), n) word
+  | wordInTally (str1, str2) word = [(getNeighbour (str1, str2) word, n)]
+  | otherwise = []
+
 {-
+SKA MAN GÖRA ETT ERROR MEDDELANDE ISTÄLLET FÖR ATT TA EN TOM LISTA?
 -}
 neighbours :: PairsTally -> String -> WordTally
-neighbours = undefined  -- remove "undefined" and write your function here
+neighbours [] word = []
+neighbours [x] word = neighbourAUX x word
+neighbours (x:xs) word = neighbourAUX x word ++ neighbours xs word
 
 
 -- 6 ##########################################################################
