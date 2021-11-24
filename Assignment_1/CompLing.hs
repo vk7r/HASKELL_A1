@@ -1,4 +1,7 @@
 
+-- ASSIGNMENT 1 - Oliver Hansson & Viktor Kangasniemi
+
+
 -- DO NOT MODIFY THE FOLLOWING LINE
 module CompLing(wordCount, adjacentPairs, pairsCount, neighbours, mostCommonNeighbour) where
 
@@ -133,7 +136,7 @@ pairsCount (x:xs) = [(x, pairsCountAUX x (x:xs) )] ++ pairsCount (removePairFrom
 
 -- BEÖVER VI CORNER CASES FÖR ALLA FUNKTIONER ELLER KAN VI FÖRKLARA PRECONDITIONS?
 
-wordInTally :: (String, String) -> String -> Bool
+wordInTally :: (String, String) -> String -> Bool -- KAN SKRIVAS OM INOM ANNAN FUNK
 wordInTally (str1, str2) word =
   if word == str1 || word == str2
     then True
@@ -161,11 +164,35 @@ neighbours (x:xs) word = neighbourAUX x word ++ neighbours xs word
 
 
 -- 6 ##########################################################################
+
+wordInTally2 :: PairsTally -> String -> Bool
+wordInTally2 [] word = False
+wordInTally2 (x:xs) word
+  | word == str1 || word == str2 = True
+  | otherwise = wordInTally2 xs word
+  where
+    ((str1, str2), n) = x
+
+getPairNum :: (String, Int) -> Int
+getPairNum (str, n) = n
+
+getPairString :: (String, Int) -> String
+getPairString (str, n) = str
+
+mostCommonNeighbourAUX :: WordTally -> String
+mostCommonNeighbourAUX [] = []
+mostCommonNeighbourAUX [x] = getPairString x
+mostCommonNeighbourAUX (x:y:xs)
+  | getPairNum x >= getPairNum y = mostCommonNeighbourAUX (x:xs)
+  | otherwise = mostCommonNeighbourAUX (y:xs)
+
 {-
 -}
 mostCommonNeighbour :: PairsTally -> String -> Maybe String
-mostCommonNeighbour = undefined  -- remove "undefined" and write your function here
-
+--mostCommonNeighbour [] word = Nothing
+mostCommonNeighbour pTally word
+  | wordInTally2 pTally word = Just (mostCommonNeighbourAUX (neighbours pTally word))
+  | otherwise = Nothing
 
 
 -- Test Cases
