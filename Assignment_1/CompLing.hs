@@ -99,23 +99,29 @@ finalPairs (x:xs) = getFinalPairOfLst x ++ finalPairs xs
 
 -- 4 ##########################################################################
 
---PRE ATT DET SKA VARA ETT PAR KANSKE ÄNDÅ BLIR ERROR DÅ TYPEN BEHÖVER EXAKT 2 ST
--- isPair :: (String, String) -> (String, String) -> Bool
--- isPair (a:b) (x:y) = if (a == x || a == y) && (b == x || b == y)
---   then
---     True
---   else
---     False
+-- PRE ATT DET SKA VARA ETT PAR KANSKE ÄNDÅ BLIR ERROR DÅ TYPEN BEHÖVER EXAKT 2 ST
+isPair :: (String, String) -> (String, String) -> Bool
+isPair (a,b) (x,y) = if (a == x || a == y) && (b == x || b == y)
+  then True
+  else False
+
+removePairFromPairs :: (String, String) -> Pairs -> Pairs
+removePairFromPairs (str1, str2) pairs =
+  [x | x <- pairs, not (isPair (str1, str2) x)]
+
+pairsCountAUX :: (String, String) -> Pairs -> Int
+pairsCountAUX (_,_) [] = 0
+pairsCountAUX (str1, str2) (x:xs)
+  | isPair (str1, str2) x = 1 + pairsCountAUX (str1, str2) xs  -- om det är samma park
+  | otherwise = 0 + pairsCountAUX (str1, str2) xs
+
 -- {-
 -- -}
 pairsCount :: Pairs -> PairsTally
-pairsCount = undefined
+pairsCount [] = []
+pairsCount [x] = [((x), 1)]
+pairsCount (x:xs) = [(x, pairsCountAUX x (x:xs) )] ++ pairsCount (removePairFromPairs x xs)
 
--- pairsCount [] = []
--- pairsCount [x] = [x]
--- pairsCount (x:y:xs)
---   | isPair x y = [((x, y), 23)] ++ pairsCount xs
---   | otherwise = pairsCount xs
 
 
 -- 5 ##########################################################################
