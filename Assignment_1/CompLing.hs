@@ -17,14 +17,18 @@ type PairsTally = [((String, String), Int)]
 
 -- 1 ##########################################################################
 
-{-
+{- mergeDoc doc
+
+VARIANT: 
 -}
 mergeDoc :: Document -> Sentence
 mergeDoc [] = []
 mergeDoc (x:xs) =
   x ++ mergeDoc xs
 
-{-
+{- strInLst
+
+VARIANT:
 -}
 strInLst ::  String -> Sentence -> Int -- byt till bättre namn
 strInLst str [] = 0
@@ -33,18 +37,20 @@ strInLst str (x:xs)
   | otherwise = 0 + strInLst str xs
 
 
-{-
+{- removeStrFromLst
 -}
 removeStrFromLst :: String -> Sentence -> Sentence
 removeStrFromLst str lst = [x | x <- lst, x /= str]
 
-{-
+{- wordCount
+
+VARIANT:
 -}
 wordCountInLst :: Sentence -> WordTally
 wordCountInLst [] = []
 wordCountInLst (x:xs) = [(x, strInLst x (x:xs) )] ++ wordCountInLst (removeStrFromLst x xs)
 
-{-
+{- wordCount
 CAPITAL SENSITIVE
 -}
 wordCount :: Document -> WordTally
@@ -53,7 +59,9 @@ wordCount doc = wordCountInLst (mergeDoc doc)
 
 -- 2 ##########################################################################
 
-{-
+{- pairsInLst
+
+VARIANT:
 -}
 pairsInLst :: Sentence -> Pairs
 pairsInLst [] = []
@@ -61,7 +69,9 @@ pairsInLst [_] = []
 pairsInLst (x:y:[]) = [(x, y)]
 pairsInLst (x:y:xs) = [(x, y)] ++ pairsInLst (y:xs)
 
-{-
+{- adjacentPairs
+
+VARIANT:
 -}
 adjacentPairs :: Document -> Pairs
 adjacentPairs [] = []
@@ -71,7 +81,7 @@ adjacentPairs (x:xs) = pairsInLst x ++ adjacentPairs xs
 
 -- 3 ##########################################################################
 
-{-
+{- getInitialPairOfLst
 -}
 getInitialPairOfLst :: Sentence -> Pairs
 getInitialPairOfLst [] = []
@@ -79,7 +89,7 @@ getInitialPairOfLst [x] = []
 getInitialPairOfLst (x:y:xs) = [(x, y)]
 
 
-{-
+{- getFinalPairOfLst
 -}
 getFinalPairOfLst :: Sentence -> Pairs
 getFinalPairOfLst [] = []
@@ -87,13 +97,17 @@ getFinalPairOfLst [x] = []
 getFinalPairOfLst lst = [( lst !! (length lst - 2) , lst !! (length lst - 1))]
 
 
-{-
+{-initialPairs
+
+VARIANT:
 -}
 initialPairs :: Document -> Pairs
 initialPairs [] = []
 initialPairs (x:xs) = getInitialPairOfLst x ++ initialPairs xs
 
-{-
+{- finalPairs
+
+VARIANT:
 -}
 finalPairs :: Document -> Pairs
 finalPairs [] = []
@@ -102,20 +116,22 @@ finalPairs (x:xs) = getFinalPairOfLst x ++ finalPairs xs
 
 -- 4 ##########################################################################
 
-{-
+{- isPair
 -}
 isPair :: (String, String) -> (String, String) -> Bool
 isPair (a,b) (x,y) = if (a == x || a == y) && (b == x || b == y)
   then True
   else False
 
-{-
+{-removePairFromPairs
 -}
 removePairFromPairs :: (String, String) -> Pairs -> Pairs
 removePairFromPairs (str1, str2) pairs =
   [x | x <- pairs, not (isPair (str1, str2) x)]
 
-{-
+{- pairsCountAUX
+
+VARIANT:
 -}
 pairsCountAUX :: (String, String) -> Pairs -> Int
 pairsCountAUX (_,_) [] = 0
@@ -123,7 +139,9 @@ pairsCountAUX (str1, str2) (x:xs)
   | isPair (str1, str2) x = 1 + pairsCountAUX (str1, str2) xs  -- om det är samma par
   | otherwise = 0 + pairsCountAUX (str1, str2) xs
 
-{-
+{- pairsCount
+
+VARIANT:
 -}
 pairsCount :: Pairs -> PairsTally
 pairsCount [] = []
@@ -136,26 +154,33 @@ pairsCount (x:xs) = [(x, pairsCountAUX x (x:xs) )] ++ pairsCount (removePairFrom
 
 -- BEÖVER VI CORNER CASES FÖR ALLA FUNKTIONER ELLER KAN VI FÖRKLARA PRECONDITIONS?
 
+{- wordInTally
+-}
 wordInTally :: (String, String) -> String -> Bool -- KAN SKRIVAS OM INOM ANNAN FUNK
 wordInTally (str1, str2) word =
   if word == str1 || word == str2
     then True
     else False
 
+{- getNeighbour
+-}
 getNeighbour :: (String, String) -> String -> String
 getNeighbour (str1, str2) word =
   if word == str1
     then str2
     else str1
 
-
+{- neighbourAUX
+-}
 neighbourAUX :: ((String, String), Int) -> String -> WordTally
 neighbourAUX ((str1, str2), n) word
   | wordInTally (str1, str2) word = [(getNeighbour (str1, str2) word, n)]
   | otherwise = []
 
-{-
+{- neighbours
 SKA MAN GÖRA ETT ERROR MEDDELANDE ISTÄLLET FÖR ATT TA EN TOM LISTA?
+
+VARIANT:
 -}
 neighbours :: PairsTally -> String -> WordTally
 neighbours [] word = []
@@ -165,7 +190,13 @@ neighbours (x:xs) word = neighbourAUX x word ++ neighbours xs word
 
 -- 6 ##########################################################################
 
-wordInTally2 :: PairsTally -> String -> Bool
+-- HAR EJ KOLLAT CORNER CASES ALLS PÅ DENNA
+
+{- wordInTally2
+
+VARIANT:
+-}
+wordInTally2 :: PairsTally -> String -> Bool -- KAN MAN ANVÄNDA DEN FÖRSTA WORD IN TALLY FUNKTIONEN
 wordInTally2 [] word = False
 wordInTally2 (x:xs) word
   | word == str1 || word == str2 = True
@@ -173,20 +204,29 @@ wordInTally2 (x:xs) word
   where
     ((str1, str2), n) = x
 
+{- getPairNum
+-}
 getPairNum :: (String, Int) -> Int
 getPairNum (str, n) = n
 
+{- getPairString
+-}
 getPairString :: (String, Int) -> String
 getPairString (str, n) = str
 
+{- mostCommonNeighbourAUX
+
+VARIANT:
+-}
 mostCommonNeighbourAUX :: WordTally -> String
-mostCommonNeighbourAUX [] = []
+mostCommonNeighbourAUX [] = ""
 mostCommonNeighbourAUX [x] = getPairString x
 mostCommonNeighbourAUX (x:y:xs)
   | getPairNum x >= getPairNum y = mostCommonNeighbourAUX (x:xs)
   | otherwise = mostCommonNeighbourAUX (y:xs)
 
-{-
+
+{- mostCommonNeighbour
 -}
 mostCommonNeighbour :: PairsTally -> String -> Maybe String
 --mostCommonNeighbour [] word = Nothing
